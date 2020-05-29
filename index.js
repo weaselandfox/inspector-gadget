@@ -1,15 +1,20 @@
-const express = require('express')
-const app = express()
-const port = process.env.PORT || 3000
+const express = require('express');
+
+const logger = require('./lib/logger');
+
+const app = express();
+const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.post('*', (req, res) => {
-  console.log('-----START REQUEST-----');
-  console.log('HEADERS', JSON.stringify(req.headers));
-  console.log('BODY', JSON.stringify(req.body));
-  console.log('-----END-----');
-  res.send('received content')
-})
+app.all('*', (req, res) => {
+  const { headers, body, connection } = req;
 
-app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
+  res.send({
+    headers,
+    body,
+    remoteAddress: connection.remoteAddress,
+  });
+});
+
+app.listen(port, () => logger.log(`App listening at http://localhost:${port}`));
